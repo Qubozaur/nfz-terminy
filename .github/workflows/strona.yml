@@ -71,16 +71,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sprawdzenie, czy dane już istnieją
+        id: dane
         run: |
-          if ! git ls-remote --exit-code --heads origin dane > /dev/null; then
-            echo "::error::Brak gałęzi 'dane'. Uruchom ten workflow ręcznie z zaznaczoną opcją 'Pobierz świeże dane'."
-            exit 1
+          if git ls-remote --exit-code --heads origin dane > /dev/null; then
+            echo "istnieja=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "istnieja=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Nie ma jeszcze danych (gałęzi 'dane'), więc strona nie zostanie opublikowana. Uruchom ręcznie: Actions -> Strona WWW -> Run workflow, z zaznaczonym 'Pobierz świeże dane'."
           fi
       - uses: actions/checkout@v4
+        if: steps.dane.outputs.istnieja == 'true'
         with:
           ref: dane
           path: _dane
       - name: Złożenie strony
+        if: steps.dane.outputs.istnieja == 'true'
         run: |
           mkdir -p _site/data
           cp -r site/. _site/
@@ -88,8 +93,11 @@ jobs:
           cp _dane/*.json _site/data/
           ls -la _site _site/data | head -50
       - uses: actions/configure-pages@v5
+        if: steps.dane.outputs.istnieja == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.dane.outputs.istnieja == 'true'
         with:
           path: _site
       - id: deploy
+        if: steps.dane.outputs.istnieja == 'true'
         uses: actions/deploy-pages@v4
