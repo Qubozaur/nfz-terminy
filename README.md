@@ -6,9 +6,11 @@
 
 **Znajdź placówkę, w której najszybciej dostaniesz się do specjalisty na NFZ.**
 
-`nfz-terminy` to darmowe narzędzie wiersza poleceń, które przeszukuje publiczne dane NFZ
-„Terminy Leczenia” i pokazuje placówki posortowane od najkrótszego czasu oczekiwania:
-z adresem i telefonem do rejestracji.
+`nfz-terminy` przeszukuje publiczne dane NFZ „Terminy Leczenia” i pokazuje placówki
+posortowane od najkrótszego czasu oczekiwania: z adresem i telefonem do rejestracji.
+Działa jako **strona WWW** (bez instalowania czegokolwiek) i jako narzędzie wiersza poleceń.
+
+**Strona: <https://qubozaur.github.io/nfz-terminy/>**
 
 Dla kogo? Dla każdego, kto dostał skierowanie i nie chce czekać pół roku, bo nie wie,
 że kilka kilometrów dalej kolejka jest kilka razy krótsza. Także dla osób, które pomagają
@@ -22,7 +24,19 @@ w tym rodzicom czy dziadkom.
 > konkretną wolną datę. **Zawsze potwierdź termin telefonicznie** w rejestracji.
 > To nie jest oficjalna aplikacja NFZ.
 
-## Instalacja
+## Strona WWW
+
+Wybierz województwo, wpisz specjalistę (np. „ortopeda”, polskie znaki można pominąć),
+opcjonalnie miejscowość i udogodnienia: podjazd, winda, łazienka dla niepełnosprawnych,
+parking, przyjmowanie dzieci. Wyniki można wysłać komuś linkiem, bo filtry są zapisane
+w adresie strony. Strona działa też na telefonie.
+
+API NFZ nie pozwala odpytywać się bezpośrednio z przeglądarki, więc dane są pobierane raz
+na dobę przez GitHub Actions (`python -m nfz_terminy.export`) i publikowane jako pliki JSON
+razem ze stroną. Ponieważ placówki i tak aktualizują dane mniej więcej raz w tygodniu,
+nie tracimy na aktualności.
+
+## Instalacja narzędzia wiersza poleceń
 
 Potrzebny jest Python 3.11 lub nowszy. Jedna komenda:
 
@@ -159,11 +173,27 @@ mypy
 Testy korzystają z prawdziwych odpowiedzi API zapisanych w [`tests/fixtures/`](tests/fixtures/).
 Zrzut ekranu w README odświeża `python scripts/zrzut_ekranu.py`.
 
+### Strona lokalnie
+
+```bash
+python -m nfz_terminy.export --out site/data --woj opolskie   # dane jednego województwa, ok. 2 min
+python -m http.server -d site 8000                            # http://localhost:8000
+node --test site/tests/logic.test.mjs                         # testy logiki strony
+```
+
+Strona to zwykłe pliki HTML/CSS/JS w [`site/`](site/), bez kroku budowania.
+Publikuje ją workflow [`strona.yml`](.github/workflows/strona.yml); dane trzyma w gałęzi
+`dane`, żeby nie zaśmiecać historii `main`.
+
+**Pierwsze uruchomienie we własnym forku:** Settings → Pages → Source: *GitHub Actions*,
+potem Actions → *Strona WWW* → *Run workflow* z zaznaczonym „Pobierz świeże dane”.
+
 ## Plany
 
 - [x] Wyszukiwarka w terminalu
+- [x] Strona WWW z filtrami dostępności
+- [ ] Mapa placówek
 - [ ] `nfz obserwuj`: powiadomienie na Telegramie, gdy pojawi się krótsza kolejka
-- [ ] Prosta strona WWW z mapą i filtrami dostępności (podjazd, winda, świadczenia dla dzieci)
 
 Zgłoszenia błędów i pomysły mile widziane w [Issues](https://github.com/Qubozaur/nfz-terminy/issues).
 

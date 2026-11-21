@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kolejki do specjalistów NFZ</title>
+  <meta name="description" content="Sprawdź, gdzie najszybciej dostaniesz się do specjalisty na NFZ. Placówki posortowane od najkrótszej prognozy czasu oczekiwania, z adresem i telefonem.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#wyniki">Przejdź do wyników</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Kolejki do specjalistów NFZ</h1>
+      <p class="lead">Sprawdź, gdzie najszybciej dostaniesz się do lekarza na NFZ w swoim województwie.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <aside class="notice" aria-label="Ważne informacje o danych">
+      <strong>To prognoza, nie rezerwacja.</strong>
+      Pokazujemy przewidywany czas oczekiwania wyliczony przez NFZ na podstawie danych od placówek,
+      które aktualizują je mniej więcej raz w tygodniu. <strong>Zawsze potwierdź termin telefonicznie.</strong>
+      Strona nie jest serwisem NFZ.
+    </aside>
+
+    <form id="szukaj" class="search" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="woj">Województwo</label>
+        <select id="woj" name="woj" required>
+          <option value="">Wybierz województwo</option>
+        </select>
+      </div>
+
+      <div class="field field-benefit">
+        <label for="swiadczenie" id="swiadczenie-label">Specjalista lub świadczenie</label>
+        <div class="combobox">
+          <input id="swiadczenie" name="swiadczenie" type="text" role="combobox"
+                 aria-autocomplete="list" aria-expanded="false" aria-controls="swiadczenia-lista"
+                 placeholder="np. ortopeda, okulista, kardiolog" disabled>
+          <ul id="swiadczenia-lista" class="listbox" role="listbox"
+              aria-labelledby="swiadczenie-label" hidden></ul>
+        </div>
+        <p class="hint">Możesz pisać bez polskich znaków.</p>
+      </div>
+
+      <div class="field">
+        <label for="miasto">Miejscowość</label>
+        <select id="miasto" name="miasto" disabled>
+          <option value="">Całe województwo</option>
+        </select>
+      </div>
+
+      <fieldset class="field field-case">
+        <legend>Rodzaj skierowania</legend>
+        <div class="segmented">
+          <input type="radio" id="przypadek-1" name="przypadek" value="1" checked>
+          <label for="przypadek-1">Stabilne</label>
+          <input type="radio" id="przypadek-2" name="przypadek" value="2">
+          <label for="przypadek-2">Pilne</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field field-filters">
+        <legend>Udogodnienia</legend>
+        <div class="checks" id="filtry"></div>
+      </fieldset>
+    </form>
+
+    <section id="wyniki" class="results" aria-labelledby="wyniki-naglowek">
+      <h2 id="wyniki-naglowek" class="visually-hidden">Wyniki</h2>
+      <p id="status" class="status" role="status" aria-live="polite">Wczytywanie...</p>
+      <ol id="lista" class="cards"></ol>
+      <button id="wiecej" type="button" class="more" hidden>Pokaż więcej</button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>
+        Dane: Narodowy Fundusz Zdrowia, API
+        <a href="https://apinfz.nfz.gov.pl/app-itl-api-pcus/">Terminy Leczenia</a>.
+        <span id="aktualizacja"></span>
+      </p>
+      <p>
+        Projekt open source <a href="https://github.com/Qubozaur/nfz-terminy">nfz-terminy</a>
+        (licencja MIT). Znalazłeś błąd?
+        <a href="https://github.com/Qubozaur/nfz-terminy/issues">Zgłoś go</a>.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
