@@ -14,11 +14,14 @@ Uwagi z obserwacji prawdziwego API:
 
 from __future__ import annotations
 
+import ssl
 import time
 from collections.abc import Callable, Iterator
+from functools import cache
 from types import TracebackType
 from typing import Any, Self, TypeVar
 
+import certifi
 import httpx
 from pydantic import ValidationError
 
@@ -35,6 +38,12 @@ T = TypeVar("T")
 
 # (numer pobranej strony, liczba wszystkich stron) - do paska postępu w CLI
 ProgressCallback = Callable[[int, int], None]
+
+
+@cache
+def _ssl_context() -> ssl.SSLContext:
+    """Wspólny kontekst TLS - wczytanie certyfikatów jest kosztowne, a klientów bywa wiele."""
+    return ssl.create_default_context(cafile=certifi.where())
 
 
 class NfzApiError(Exception):
@@ -63,6 +72,7 @@ class NfzClient:
     ) -> None:
         self._http = http_client or httpx.Client(
             base_url=base_url,
+            verify=_ssl_context(),
             timeout=timeout,
             headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
             follow_redirects=True,

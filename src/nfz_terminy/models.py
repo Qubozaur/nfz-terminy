@@ -140,11 +140,11 @@ def _flag(value: str | None) -> bool | None:
     return None
 
 
-def _phone(value: str | None) -> str | None:
-    """Pusty napis z API (np. "additional-phone": "") traktujemy jak brak numeru."""
-    if not value or not value.strip():
+def _clean(value: str | None) -> str | None:
+    """Usuwa nadmiarowe spacje (w danych NFZ zdarza się np. "PCK  1"); pusty napis -> None."""
+    if not value:
         return None
-    return value.strip()
+    return " ".join(value.split()) or None
 
 
 class QueueEntry(BaseModel):
@@ -190,13 +190,13 @@ class QueueEntry(BaseModel):
             pcus=a.dates.pcus,
             wait_days=parse_pcus(a.dates.pcus),
             situation_as_at=a.dates.situation_as_at,
-            provider=a.provider,
-            place=a.place,
-            address=a.address,
-            locality=a.locality,
-            phone=_phone(a.phone),
-            registration_phone=_phone(a.registration_phone),
-            website=a.website or None,
+            provider=_clean(a.provider),
+            place=_clean(a.place),
+            address=_clean(a.address),
+            locality=_clean(a.locality),
+            phone=_clean(a.phone),
+            registration_phone=_clean(a.registration_phone),
+            website=_clean(a.website),
             awaiting=provider_stats.awaiting if provider_stats else None,
             average_period=provider_stats.average_period if provider_stats else None,
             for_children=_flag(a.benefits_for_children),
