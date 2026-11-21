@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Środowiska
+.venv/
+venv/
+.env
+
+# Narzędzia
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Lokalne dane (cache słowników, baza alertów)
+*.sqlite3
+*.db
+
+# Edytory / system
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

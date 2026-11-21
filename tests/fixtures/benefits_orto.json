@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "context": "https://apinfz.nfz.gov.pl/app-itl-api-pcus/schemas/#benefit",
+    "count": 8,
+    "title": "benefit",
+    "page": 1,
+    "url": null,
+    "limit": 25,
+    "provider": "Narodowy Fundusz Zdrowia",
+    "date-published": "2026-11-21T18:32:49+00:00",
+    "date-modified": "2026-11-21T18:32:49+00:00",
+    "description": "Zasób zwraca nazwy świadczeń zdrowotnych wybranych z bazy danych z nazwami świadczeń zdefiniowanych przez NFZ. Lista świadczeń jest wynikiem wyszukiwania według przekazanych parametrów.",
+    "keywords": "świadczenia, leczenie, poradnia, poradnie, szpital, szpitale",
+    "language": "PL",
+    "content-type": "application/json; charset=utf-8",
+    "is-part-of": "Słowniki",
+    "message": {
+      "type": null,
+      "content": ""
+    }
+  },
+  "links": {
+    "first": "/benefits?page=1&limit=25&format=json&name=orto",
+    "prev": null,
+    "self": "/benefits?page=1&limit=25&format=json&name=orto",
+    "next": null,
+    "last": "/benefits?page=1&limit=25&format=json&name=orto"
+  },
+  "data": [
+    "LECZENIE APARATEM ORTODONTYCZNYM",
+    "ODDZIAŁ CHIRURGII URAZOWO-ORTOPEDYCZNEJ",
+    "ODDZIAŁ CHIRURGII URAZOWO-ORTOPEDYCZNEJ DLA DZIECI",
+    "PORADNIA MEDYCYNY SPORTOWEJ",
+    "PORADNIA MEDYCYNY SPORTOWEJ DLA DZIECI",
+    "PORADNIA ORTODONTYCZNA (UDZIELA ŚWIADCZEŃ DLA DZIECI I MŁODZIEŻY W RAMACH UMOWY Z NFZ DO 18 R.Ż).",
+    "PORADNIA ORTODONTYCZNA DLA DZIECI",
+    "ŚWIADCZENIA Z ZAKRESU ORTOPEDII I TRAUMATOLOGII NARZĄDU RUCHU"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "errors": [
+    {
+      "id": "b9aa8c2e-84d4-4ef0-a391-aed8302c1803",
+      "error-result": "Cannot return results",
+      "error-reason": "Nieprzekazany wymagany atrybut name",
+      "error-solution": "Nieprzekazano wymaganego parametru wejściowego lub długość wartości parametru jest inna niż oczekiwana (min. 3 znaki).",
+      "error-help": "https://apinfz.nfz.gov.pl/app-itl-api-pcus/errors/#1200022",
+      "error-code": 1200022
+    }
+  ]
+}

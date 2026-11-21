@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "context": "https://apinfz.nfz.gov.pl/app-itl-api-pcus/schemas/#locality",
+    "count": 0,
+    "title": "locality",
+    "page": 1,
+    "url": null,
+    "limit": 25,
+    "provider": "Narodowy Fundusz Zdrowia",
+    "date-published": "2026-11-21T18:32:56+00:00",
+    "date-modified": "2026-11-21T18:32:56+00:00",
+    "description": "Zasób zwraca nazwy miejscowości miejsc udzielania świadczeń zdrowotnych wybranych z bazy danych z nazwami miejsc, które zawierają pozycje dostarczane przez podmioty świadczące opiekę zdrowotną. Lista miejsc jest wynikiem wyszukiwania według przekazanych parametrów.",
+    "keywords": "miejscowość, miejscowości, poradnie, poradnia, poradnie, szpital, szpitale, adres",
+    "language": "PL",
+    "content-type": "application/json; charset=utf-8",
+    "is-part-of": "Słowniki",
+    "message": {
+      "type": null,
+      "content": ""
+    }
+  },
+  "links": {
+    "first": "/localities?page=1&limit=25&format=json&name=lodz",
+    "prev": null,
+    "self": "/localities?page=1&limit=25&format=json&name=lodz",
+    "next": null,
+    "last": "/localities?page=0&limit=25&format=json&name=lodz"
+  },
+  "data": []
+}

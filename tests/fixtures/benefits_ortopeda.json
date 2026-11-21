@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "context": "https://apinfz.nfz.gov.pl/app-itl-api-pcus/schemas/#benefit",
+    "count": 3,
+    "title": "benefit",
+    "page": 1,
+    "url": null,
+    "limit": 25,
+    "provider": "Narodowy Fundusz Zdrowia",
+    "date-published": "2026-11-21T18:32:51+00:00",
+    "date-modified": "2026-11-21T18:32:51+00:00",
+    "description": "Zasób zwraca nazwy świadczeń zdrowotnych wybranych z bazy danych z nazwami świadczeń zdefiniowanych przez NFZ. Lista świadczeń jest wynikiem wyszukiwania według przekazanych parametrów.",
+    "keywords": "świadczenia, leczenie, poradnia, poradnie, szpital, szpitale",
+    "language": "PL",
+    "content-type": "application/json; charset=utf-8",
+    "is-part-of": "Słowniki",
+    "message": {
+      "type": null,
+      "content": ""
+    }
+  },
+  "links": {
+    "first": "/benefits?page=1&limit=25&format=json&name=ortopeda",
+    "prev": null,
+    "self": "/benefits?page=1&limit=25&format=json&name=ortopeda",
+    "next": null,
+    "last": "/benefits?page=1&limit=25&format=json&name=ortopeda"
+  },
+  "data": [
+    "ODDZIAŁ CHIRURGII URAZOWO-ORTOPEDYCZNEJ",
+    "ODDZIAŁ CHIRURGII URAZOWO-ORTOPEDYCZNEJ DLA DZIECI",
+    "ŚWIADCZENIA Z ZAKRESU ORTOPEDII I TRAUMATOLOGII NARZĄDU RUCHU"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "context": "https://apinfz.nfz.gov.pl/app-itl-api-pcus/schemas/#locality",
+    "count": 14,
+    "title": "locality",
+    "page": 2,
+    "url": null,
+    "limit": 25,
+    "provider": "Narodowy Fundusz Zdrowia",
+    "date-published": "2026-11-21T18:33:05+00:00",
+    "date-modified": "2026-11-21T18:33:05+00:00",
+    "description": "Zasób zwraca nazwy miejscowości miejsc udzielania świadczeń zdrowotnych wybranych z bazy danych z nazwami miejsc, które zawierają pozycje dostarczane przez podmioty świadczące opiekę zdrowotną. Lista miejsc jest wynikiem wyszukiwania według przekazanych parametrów.",
+    "keywords": "miejscowość, miejscowości, poradnie, poradnia, poradnie, szpital, szpitale, adres",
+    "language": "PL",
+    "content-type": "application/json; charset=utf-8",
+    "is-part-of": "Słowniki",
+    "message": {
+      "type": null,
+      "content": ""
+    }
+  },
+  "links": {
+    "first": "/dictionaries/localities?page=1&limit=25&format=json",
+    "prev": "/dictionaries/localities?page=1&limit=25&format=json",
+    "self": "/dictionaries/localities?page=2&limit=25&format=json",
+    "next": null,
+    "last": "/dictionaries/localities?page=2&limit=25&format=json"
+  },
+  "data": [
+    {
+      "name": "ŁOWICZ",
+      "province": "05",
+      "county": "ŁOWICKI"
+    },
+    {
+      "name": "ŁÓDŹ",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    },
+    {
+      "name": "ŁÓDŹ-BAŁUTY",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    },
+    {
+      "name": "ŁÓDŹ-GÓRNA",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    },
+    {
+      "name": "ŁÓDŹ-POLESIE",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    },
+    {
+      "name": "ŁÓDŹ-WIDZEW",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    },
+    {
+      "name": "ŁÓDŹ-ŚRÓDMIEŚCIE",
+      "province": "05",
+      "county": "ŁÓDŹ"
+    }
+  ]
+}
