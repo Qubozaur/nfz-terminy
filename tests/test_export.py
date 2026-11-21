@@ -232,3 +232,12 @@ class TestNfzCoordinates:
             locate=lambda _: GeoPoint(10.0, 10.0, approximate=False),
         )
         assert as_dicts(data)[0]["lat"] is None
+
+
+def test_export_page_limit_fits_largest_province() -> None:
+    # regresja: mazowieckie (10 361 kolejek = 415 stron) przekraczało domyślny limit 400 stron
+    # i nocny eksport przerywał się po ok. godzinie
+    from nfz_terminy.client import MAX_PAGE_SIZE
+    from nfz_terminy.export import EXPORT_MAX_PAGES
+
+    assert EXPORT_MAX_PAGES * MAX_PAGE_SIZE >= 2 * 10_361

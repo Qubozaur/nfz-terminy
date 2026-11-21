@@ -208,3 +208,13 @@ def test_unexpected_payload_shape(client: NfzClient, api: respx.MockRouter) -> N
     api.get("/benefits").mock(return_value=json_response({"data": [{"nie": "napis"}]}))
     with pytest.raises(NfzApiError, match="format odpowiedzi"):
         client.search_benefits("orto")
+
+
+def test_page_limit_stops_runaway_pagination(fake_time: FakeTime, api: respx.MockRouter) -> None:
+    page = {"meta": {"count": 75}, "links": {"next": "/benefits?page=x"}, "data": ["A"]}
+    api.get("/benefits").mock(return_value=json_response(page))
+    with (
+        NfzClient(max_pages=2, sleep=fake_time.sleep, clock=fake_time.clock) as c,
+        pytest.raises(NfzApiError, match="limit 2 stron"),
+    ):
+        c.search_benefits("orto")

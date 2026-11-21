@@ -69,6 +69,8 @@ FLAG_APPROX_LOCATION = 64
 # Ile razy ponowić całe województwo, gdy klient wyczerpie swoje próby (np. dłuższa awaria)
 PROVINCE_ATTEMPTS = 3
 PROVINCE_RETRY_PAUSE = 60.0
+# Mazowieckie ma ok. 415 stron po 25 kolejek; zapas na wzrost liczby kolejek
+EXPORT_MAX_PAGES = 2000
 
 Log = Callable[[str], None]
 Locator = Callable[[QueueEntry], GeoPoint | None]
@@ -365,7 +367,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     deadline = time.monotonic() + args.geokod_minut * 60
     geocoder = Geocoder(args.geokod_cache) if args.geokoduj else None
     # eksport trwa długo, więc klient jest cierpliwszy niż w CLI
-    with NfzClient(min_interval=0.3, max_retries=8, max_backoff=120.0) as client:
+    # max_pages: mazowieckie to ponad 400 stron (10 tys. kolejek) - limit CLI by je uciął
+    with NfzClient(
+        min_interval=0.3, max_retries=8, max_backoff=120.0, max_pages=EXPORT_MAX_PAGES
+    ) as client:
         try:
             manifest = export_all(
                 client,
