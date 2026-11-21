@@ -109,7 +109,9 @@ class NfzClient:
 
     def list_localities(self, province: str) -> list[LocalityEntry]:
         """Pełny słownik miejscowości województwa (GET /dictionaries/localities)."""
-        return list(self._paginate("/dictionaries/localities", {"province": province}, LocalityEntry))
+        return list(
+            self._paginate("/dictionaries/localities", {"province": province}, LocalityEntry)
+        )
 
     def queues(
         self,
@@ -225,7 +227,7 @@ class NfzClient:
         return float(min(self._max_backoff, self._backoff_base * 2**attempt))
 
     def _retry_delay(self, response: httpx.Response, attempt: int) -> float:
-        """Czas oczekiwania przed ponowieniem: Retry-After (sekundy), jeśli jest, inaczej backoff."""
+        """Przerwa przed ponowieniem: Retry-After (w sekundach), jeśli jest, inaczej backoff."""
         retry_after = response.headers.get("retry-after", "")
         if retry_after.strip().isdigit():
             return float(min(self._max_backoff, int(retry_after)))

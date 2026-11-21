@@ -51,7 +51,9 @@ def json_response(payload: Any, status: int = 200) -> httpx.Response:
 def test_sends_user_agent_and_api_version(
     client: NfzClient, api: respx.MockRouter, fixture_json: Callable[[str], Any]
 ) -> None:
-    route = api.get("/benefits").mock(return_value=json_response(fixture_json("benefits_orto.json")))
+    route = api.get("/benefits").mock(
+        return_value=json_response(fixture_json("benefits_orto.json"))
+    )
 
     names = client.search_benefits("orto")
 
@@ -120,7 +122,10 @@ def test_dictionary_pagination(
 
 
 def test_throttles_between_requests(
-    client: NfzClient, api: respx.MockRouter, fake_time: FakeTime, fixture_json: Callable[[str], Any]
+    client: NfzClient,
+    api: respx.MockRouter,
+    fake_time: FakeTime,
+    fixture_json: Callable[[str], Any],
 ) -> None:
     api.get("/benefits").mock(return_value=json_response(fixture_json("benefits_orto.json")))
     client.search_benefits("orto")
@@ -129,7 +134,10 @@ def test_throttles_between_requests(
 
 
 def test_retries_429_respecting_retry_after(
-    client: NfzClient, api: respx.MockRouter, fake_time: FakeTime, fixture_json: Callable[[str], Any]
+    client: NfzClient,
+    api: respx.MockRouter,
+    fake_time: FakeTime,
+    fixture_json: Callable[[str], Any],
 ) -> None:
     route = api.get("/benefits").mock(
         side_effect=[
