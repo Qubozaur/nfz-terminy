@@ -14,6 +14,7 @@ Prawdziwe odpowiedzi API NFZ „Terminy Leczenia” w wersji 1.4
 | `queues_ortopedia_katowice.json` | `GET /queues?case=1&province=12&benefit=ŚWIADCZENIA Z ZAKRESU ORTOPEDII I TRAUMATOLOGII NARZĄDU RUCHU&locality=KATOWICE` |
 | `queues_dermatologia_lodz_p{1,2}.json` | `GET /queues?case=1&province=05&benefit=PORADNIA DERMATOLOGICZNA&locality=ŁÓDŹ` strony 1 i 2 (zawiera też „… DLA DZIECI”) |
 | `queues_endoprotezoplastyka_06_p{1,2}.json` | `GET /queues?case=1&province=06&benefit=ENDOPROTEZOPLASTYKA STAWU BIODROWEGO` strony 1 i 2 (zawiera wpisy bez prognozy) |
+| `queues_okulistyka_warszawa_p1.json` | `GET /queues?case=1&province=07&benefit=ŚWIADCZENIA Z ZAKRESU OKULISTYKI&locality=WARSZAWA` strona 1 (dzielnice zapisane ze spacją, np. „WARSZAWA MOKOTÓW”) |
 | `error_400_name_too_short.json` | `GET /benefits?name=xq` (błąd 400) |
 | `dictionaries_localities_05_p{1,2}.json` | `GET /dictionaries/localities?province=05`, **przycięte**: wybrane prawdziwe wpisy z 8 stron rozłożone na 2 strony, żeby test paginacji był krótki |
 

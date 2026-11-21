@@ -235,17 +235,39 @@ class TestFindQueues:
         assert len(result.entries) + result.without_forecast == 28
         assert all(e.pcus for e in result.entries)
 
-    def test_district_matching(
+    def test_warsaw_districts_with_space_are_included(
+        self, client: NfzClient, api: respx.MockRouter, fixture_json: Callable[[str], Any]
+    ) -> None:
+        # regresja: dzielnice Warszawy mają w danych spację ("WARSZAWA MOKOTÓW"), nie myślnik
+        payload = fixture_json("queues_okulistyka_warszawa_p1.json")
+        payload["links"]["next"] = None
+        api.get("/queues").mock(return_value=httpx.Response(200, json=payload))
+
+        result = find_queues(
+            client, benefit="ŚWIADCZENIA Z ZAKRESU OKULISTYKI", province="07", locality="WARSZAWA"
+        )
+
+        assert len(result.entries) + result.without_forecast == len(payload["data"])
+        assert "WARSZAWA MOKOTÓW" in {e.locality for e in result.entries}
+
+    def test_other_towns_with_similar_name_are_excluded(
         self, client: NfzClient, api: respx.MockRouter, fixture_json: Callable[[str], Any]
     ) -> None:
         payload = fixture_json("queues_ortopedia_katowice.json")
-        payload["data"][0]["attributes"]["locality"] = "KATOWICE-SZOPIENICE"
-        payload["data"][1]["attributes"]["locality"] = "KATOWICEWO"
+        changes = {
+            0: ("KATOWICE-SZOPIENICE", "KATOWICE"),  # dzielnica: powiat = miasto
+            1: ("KATOWICE ZACHÓD", "KATOWICE"),  # dzielnica zapisana ze spacją
+            2: ("KATOWICE GÓRNE", "INNY POWIAT"),  # inna miejscowość o podobnej nazwie
+            3: ("KATOWICEWO", "KATOWICE"),  # nie jest dzielnicą
+        }
+        for index, (locality, county) in changes.items():
+            payload["data"][index]["attributes"]["locality"] = locality
+            payload["data"][index]["attributes"]["county"] = county
         api.get("/queues").mock(return_value=httpx.Response(200, json=payload))
 
         result = find_queues(client, benefit=ORTOPEDIA, province="12", locality="KATOWICE")
 
         localities = {e.locality for e in result.entries}
-        assert "KATOWICE-SZOPIENICE" in localities
-        assert "KATOWICEWO" not in localities
-        assert len(result.entries) == 22
+        assert {"KATOWICE-SZOPIENICE", "KATOWICE ZACHÓD"} <= localities
+        assert not localities & {"KATOWICE GÓRNE", "KATOWICEWO"}
+        assert len(result.entries) == 21

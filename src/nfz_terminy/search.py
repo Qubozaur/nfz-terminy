@@ -151,13 +151,21 @@ def _province_localities(
     return names
 
 
-def _matches_locality(entry_locality: str | None, wanted: str) -> bool:
-    """Miejscowość wpisu musi być tą samą miejscowością albo jej dzielnicą
-    ("ŁÓDŹ-BAŁUTY" pasuje do "ŁÓDŹ", ale "BIAŁA PODLASKA" nie pasuje do "BIAŁA")."""
+def _matches_locality(entry_locality: str | None, entry_county: str | None, wanted: str) -> bool:
+    """Czy wpis dotyczy szukanej miejscowości lub jej dzielnicy.
+
+    API zwraca każdą miejscowość zawierającą szukany tekst (dla "BIAŁA" także
+    "BIELSKO-BIAŁA"). Dzielnice dużych miast mają w danych NFZ postać "WARSZAWA MOKOTÓW"
+    albo "ŁÓDŹ-BAŁUTY", a ich powiat to samo miasto - po tym odróżniamy je od innych
+    miejscowości o podobnym początku nazwy (np. "BIAŁA PODLASKA" ma własny powiat).
+    """
     if not entry_locality:
         return False
     have, want = fold(entry_locality), fold(wanted)
-    return have == want or have.startswith(want + "-")
+    if have == want:
+        return True
+    is_district_name = have.startswith((want + " ", want + "-"))
+    return is_district_name and fold(entry_county or "") == want
 
 
 def find_queues(
@@ -189,7 +197,7 @@ def find_queues(
         # API dopasowuje podciąg: odrzucamy np. "... DLA DZIECI" przy zapytaniu o wersję ogólną
         if fold(attributes.benefit or "") != wanted_benefit:
             continue
-        if locality and not _matches_locality(attributes.locality, locality):
+        if locality and not _matches_locality(attributes.locality, attributes.county, locality):
             continue
         entry = QueueEntry.from_queue(queue)
         if entry is None:
