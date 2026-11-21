@@ -162,6 +162,7 @@ class QueueEntry(BaseModel):
     place: str | None
     address: str | None
     locality: str | None
+    county: str | None
     phone: str | None
     registration_phone: str | None
     website: str | None
@@ -194,6 +195,7 @@ class QueueEntry(BaseModel):
             place=_clean(a.place),
             address=_clean(a.address),
             locality=_clean(a.locality),
+            county=_clean(a.county),
             phone=_clean(a.phone),
             registration_phone=_clean(a.registration_phone),
             website=_clean(a.website),

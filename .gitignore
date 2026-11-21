@@ -26,3 +26,6 @@ htmlcov/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Dane strony WWW generowane przez eksport (publikowane z gałęzi "dane")
+site/data/

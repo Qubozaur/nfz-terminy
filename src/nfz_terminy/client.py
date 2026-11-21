@@ -126,19 +126,26 @@ class NfzClient:
     def queues(
         self,
         *,
-        benefit: str,
+        benefit: str | None = None,
         province: str | None = None,
         locality: str | None = None,
         urgent: bool = False,
         on_progress: ProgressCallback | None = None,
     ) -> list[Queue]:
-        """Wszystkie kolejki do świadczenia (GET /queues, wszystkie strony).
+        """Wszystkie kolejki (GET /queues, wszystkie strony).
+
+        API wymaga świadczenia albo województwa; samo województwo zwraca wszystkie
+        kolejki w nim (używa tego eksport danych dla strony WWW).
 
         Uwaga: API dopasowuje `benefit` i `locality` jako podciąg, więc wyniki mogą
         zawierać np. "PORADNIA X DLA DZIECI" przy zapytaniu o "PORADNIA X".
         Filtrowanie dokładnych nazw robi warstwa wyszukiwania (search.py).
         """
-        params: dict[str, Any] = {"benefit": benefit, "case": 2 if urgent else 1}
+        if not benefit and not province:
+            raise ValueError("Podaj świadczenie albo województwo (API NFZ tego wymaga).")
+        params: dict[str, Any] = {"case": 2 if urgent else 1}
+        if benefit:
+            params["benefit"] = benefit
         if province:
             params["province"] = province
         if locality:
