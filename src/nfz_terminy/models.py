@@ -90,6 +90,7 @@ class QueueAttributes(ApiModel):
     address: str | None = None
     locality: str | None = None
     county: str | None = None
+    teryt_place: str | None = Field(default=None, alias="teryt-place")
     phone: str | None = None
     registration_phone: str | None = Field(default=None, alias="registration-phone")
     website: str | None = None
@@ -163,6 +164,7 @@ class QueueEntry(BaseModel):
     address: str | None
     locality: str | None
     county: str | None
+    teryt_place: str | None
     phone: str | None
     registration_phone: str | None
     website: str | None
@@ -196,6 +198,7 @@ class QueueEntry(BaseModel):
             address=_clean(a.address),
             locality=_clean(a.locality),
             county=_clean(a.county),
+            teryt_place=_clean(a.teryt_place),
             phone=_clean(a.phone),
             registration_phone=_clean(a.registration_phone),
             website=_clean(a.website),

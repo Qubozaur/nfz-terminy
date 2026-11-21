@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from nfz_terminy.cache import LocalityCache
 from nfz_terminy.client import MIN_NAME_LENGTH, NfzClient, ProgressCallback
 from nfz_terminy.models import QueueEntry
-from nfz_terminy.text import fold
+from nfz_terminy.text import city_of, fold
 
 # Potoczne nazwy, których API nie znajduje samo - głównie przez polskie znaki
 # (wyszukiwanie po stronie NFZ rozróżnia "pluc" i "płuc") i skróty badań.
@@ -161,11 +161,9 @@ def _matches_locality(entry_locality: str | None, entry_county: str | None, want
     """
     if not entry_locality:
         return False
-    have, want = fold(entry_locality), fold(wanted)
-    if have == want:
-        return True
-    is_district_name = have.startswith((want + " ", want + "-"))
-    return is_district_name and fold(entry_county or "") == want
+    return fold(city_of(entry_locality, entry_county)) == fold(wanted) or fold(
+        entry_locality
+    ) == fold(wanted)
 
 
 def find_queues(

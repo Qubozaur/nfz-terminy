@@ -29,3 +29,4 @@ Thumbs.db
 
 # Dane strony WWW generowane przez eksport (publikowane z gałęzi "dane")
 site/data/
+geokodowanie.json

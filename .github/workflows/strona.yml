@@ -32,7 +32,7 @@ jobs:
     name: Pobranie danych z API NFZ
     if: github.event_name == 'schedule' || inputs.pobierz_dane
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 330
     permissions:
       contents: write
     steps:
@@ -42,8 +42,22 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install .
-      - name: Eksport wszystkich województw
-        run: python -m nfz_terminy.export --out dane
+      - name: Cache geokodowania z poprzedniego pobrania
+        run: |
+          mkdir -p dane/cache
+          if git ls-remote --exit-code --heads origin dane > /dev/null \
+             && git fetch -q --depth 1 origin dane \
+             && git show FETCH_HEAD:cache/geokodowanie.json > dane/cache/geokodowanie.json; then
+            echo "Wczytano cache: $(wc -c < dane/cache/geokodowanie.json) bajtów"
+          else
+            rm -f dane/cache/geokodowanie.json
+            echo "Brak cache - geokodowanie od zera (pierwsze uruchomienie potrwa dłużej)"
+          fi
+      - name: Eksport wszystkich województw z geokodowaniem
+        # po 240 min nie geokodujemy nowych adresów - resztę dokończy kolejna noc
+        run: >
+          python -m nfz_terminy.export --out dane
+          --geokoduj --geokod-cache dane/cache/geokodowanie.json --geokod-minut 240
       - name: Zapis w gałęzi "dane" (jeden commit, nadpisywany)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

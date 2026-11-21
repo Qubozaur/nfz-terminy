@@ -13,14 +13,17 @@ import respx
 from nfz_terminy.client import DEFAULT_BASE_URL, NfzApiError, NfzClient
 from nfz_terminy.export import (
     FIELDS,
+    FLAG_APPROX_LOCATION,
     FLAG_CHILDREN,
     FLAG_ELEVATOR,
     FLAG_RAMP,
     build_province_file,
     export_all,
     main,
+    nfz_coordinates,
 )
-from nfz_terminy.models import Page, Queue
+from nfz_terminy.geocode import GeoPoint
+from nfz_terminy.models import Page, Queue, QueueEntry
 
 GENERATED = datetime(2026, 11, 21, 3, 0, tzinfo=UTC)
 
@@ -157,3 +160,75 @@ def test_export_retries_province_after_client_gives_up(
 def test_main_rejects_unknown_province(tmp_path: Path) -> None:
     with pytest.raises(SystemExit):
         main(["--out", str(tmp_path), "--woj", "atlantyda"])
+
+
+class TestLocationPriority:
+    """Kolejność źródeł współrzędnych: punkt adresowy GUGiK > NFZ > środek ulicy GUGiK."""
+
+    def _rows(
+        self, fixture_json: Callable[[str], Any], point: GeoPoint | None
+    ) -> list[dict[str, Any]]:
+        queues = queues_from(fixture_json, "queues_dermatologia_lodz_p1.json")[:1]
+        assert queues[0].attributes.latitude is not None  # fixture z Łodzi ma współrzędne NFZ
+        data = build_province_file(
+            queues, province="05", urgent=False, generated=GENERATED, locate=lambda _: point
+        )
+        return as_dicts(data)
+
+    def test_exact_gugik_point_beats_nfz(self, fixture_json: Callable[[str], Any]) -> None:
+        row = self._rows(fixture_json, GeoPoint(51.1, 19.1, approximate=False))[0]
+        assert (row["lat"], row["lon"]) == (51.1, 19.1)
+        assert not row["flags"] & FLAG_APPROX_LOCATION
+
+    def test_nfz_beats_approximate_street(self, fixture_json: Callable[[str], Any]) -> None:
+        row = self._rows(fixture_json, GeoPoint(51.1, 19.1, approximate=True))[0]
+        assert (row["lat"], row["lon"]) != (51.1, 19.1)
+        assert not row["flags"] & FLAG_APPROX_LOCATION
+
+    def test_approximate_used_when_nothing_else(self, fixture_json: Callable[[str], Any]) -> None:
+        queues = queues_from(fixture_json, "queues_ortopedia_katowice.json")[:1]
+        assert queues[0].attributes.latitude is None
+        data = build_province_file(
+            queues,
+            province="12",
+            urgent=False,
+            generated=GENERATED,
+            locate=lambda _: GeoPoint(50.2, 19.0, approximate=True),
+        )
+        row = as_dicts(data)[0]
+        assert (row["lat"], row["lon"]) == (50.2, 19.0)
+        assert row["flags"] & FLAG_APPROX_LOCATION
+
+
+class TestNfzCoordinates:
+    def _entry(self, fixture_json: Callable[[str], Any], lat: float, lon: float) -> Any:
+        payload = fixture_json("queues_ortopedia_katowice.json")
+        payload["data"][0]["attributes"]["latitude"] = lat
+        payload["data"][0]["attributes"]["longitude"] = lon
+        queue = Page[Queue].model_validate(payload).data[0]
+        entry = QueueEntry.from_queue(queue)
+        assert entry is not None
+        return entry
+
+    def test_valid(self, fixture_json: Callable[[str], Any]) -> None:
+        assert nfz_coordinates(self._entry(fixture_json, 50.35, 18.91)) == (50.35, 18.91)
+
+    def test_swapped_lat_lon_is_fixed(self, fixture_json: Callable[[str], Any]) -> None:
+        # zaobserwowane w danych NFZ: Bytom jako (18.9123, 50.3539)
+        assert nfz_coordinates(self._entry(fixture_json, 18.9123, 50.3539)) == (50.3539, 18.9123)
+
+    def test_outside_poland_is_dropped(self, fixture_json: Callable[[str], Any]) -> None:
+        assert nfz_coordinates(self._entry(fixture_json, 0.0, 0.0)) is None
+
+    def test_gugik_point_outside_poland_is_ignored(
+        self, fixture_json: Callable[[str], Any]
+    ) -> None:
+        queues = queues_from(fixture_json, "queues_ortopedia_katowice.json")[:1]
+        data = build_province_file(
+            queues,
+            province="12",
+            urgent=False,
+            generated=GENERATED,
+            locate=lambda _: GeoPoint(10.0, 10.0, approximate=False),
+        )
+        assert as_dicts(data)[0]["lat"] is None
