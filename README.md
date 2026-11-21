@@ -207,5 +207,10 @@ Zgłoszenia błędów i pomysły mile widziane w [Issues](https://github.com/Qub
 
 ## Licencja
 
-[MIT](LICENSE). Dane: Narodowy Fundusz Zdrowia, API „Terminy Leczenia”
-([regulamin](https://apinfz.nfz.gov.pl/app-itl-api-pcus/)).
+[MIT](LICENSE).
+
+Źródło danych: Narodowy Fundusz Zdrowia, <https://api.nfz.gov.pl/> (API „Terminy Leczenia”;
+regulamin w [dokumentacji API](https://apinfz.nfz.gov.pl/app-itl-api-pcus/) pod przyciskiem
+„Regulamin”). Narzędzie trzyma się limitów z regulaminu: pobiera dane raz na dobę, z przerwami
+między zapytaniami, wielokrotnie poniżej dozwolonych 10 zapytań na sekundę. Położenie placówek:
+[GUGiK](https://services.gugik.gov.pl/uug/), mapa © [OpenStreetMap](https://www.openstreetmap.org/copyright).

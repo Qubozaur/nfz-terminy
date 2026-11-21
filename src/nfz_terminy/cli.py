@@ -24,7 +24,7 @@ from nfz_terminy.text import has_polish_chars
 DISCLAIMER = (
     "Prognoza NFZ (PCUS) to przewidywany czas oczekiwania według stanu na podany dzień. "
     "Placówki aktualizują dane mniej więcej raz w tygodniu - zawsze potwierdź termin "
-    "telefonicznie."
+    "telefonicznie. Źródło danych: Narodowy Fundusz Zdrowia, https://api.nfz.gov.pl/"
 )
 
 app = typer.Typer(
