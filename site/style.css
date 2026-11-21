@@ -321,9 +321,138 @@ input:disabled {
   margin-top: 24px;
 }
 
+.results-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
 .status {
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--muted);
+}
+
+.view-switch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.view-switch button {
+  min-height: 40px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  cursor: pointer;
+}
+
+.view-switch button + button {
+  border-left: 1px solid var(--border);
+}
+
+.view-switch button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .view-switch button[aria-pressed="true"] {
+    color: #04201d;
+  }
+}
+
+/* --- mapa --- */
+
+.map {
+  height: min(70vh, 640px);
+  min-height: 360px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.map-info {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* pinezka z liczbą dni; ".leaflet-marker-icon" podnosi specyficzność ponad
+   "display: block" z CSS Leafleta, który jest wczytywany później */
+.leaflet-marker-icon.pin,
+.pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 26px;
+  padding: 0 6px;
+  font: 700 13px/1 system-ui, sans-serif;
+  color: #fff;
+  background: #475569;
+  border: 2px solid #fff;
+  border-radius: 13px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+  white-space: nowrap;
+}
+
+.pin.fast { background: #15803d; }
+.pin.medium { background: #b45309; }
+.pin.slow { background: #b91c1c; }
+.pin.approx { border-style: dashed; }
+
+.leaflet-marker-icon.cluster,
+.cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  font: 700 13px/1.05 system-ui, sans-serif;
+  color: #fff;
+  background: #475569;
+  border: 3px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.35);
+}
+
+.cluster small {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.cluster.fast { background: #15803d; }
+.cluster.medium { background: #b45309; }
+.cluster.slow { background: #b91c1c; }
+
+.popup {
+  font: 14px/1.4 system-ui, sans-serif;
+  color: #1c2321;
+  min-width: 200px;
+}
+
+.popup .pcus {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.popup p {
+  margin: 4px 0;
+}
+
+.popup .muted {
+  color: #5b6662;
+  font-size: 0.85em;
 }
 
 .status strong {

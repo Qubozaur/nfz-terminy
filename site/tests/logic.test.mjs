@@ -108,3 +108,10 @@ test("linki: telefon, strona, mapa", () => {
   assert.match(mapHref({ lat: 51.7, lon: 19.4 }), /query=51\.7%2C19\.4$/);
   assert.match(mapHref({ address: "PCK 1", locality: "KATOWICE" }), /query=PCK%201%2C%20KATOWICE$/);
 });
+
+test("inPoland odrzuca punkty spoza Polski i zamienione współrzędne", async () => {
+  const { inPoland } = await import("../logic.js");
+  assert.equal(inPoland(50.35, 18.91), true); // Bytom
+  assert.equal(inPoland(18.91, 50.35), false); // zamienione przez NFZ
+  assert.equal(inPoland(null, 19), false);
+});

@@ -73,7 +73,15 @@
 
     <section id="wyniki" class="results" aria-labelledby="wyniki-naglowek">
       <h2 id="wyniki-naglowek" class="visually-hidden">Wyniki</h2>
-      <p id="status" class="status" role="status" aria-live="polite">Wczytywanie...</p>
+      <div class="results-bar">
+        <p id="status" class="status" role="status" aria-live="polite">Wczytywanie...</p>
+        <div class="view-switch" role="group" aria-label="Sposób wyświetlania wyników">
+          <button type="button" data-view="lista" aria-pressed="true">Lista</button>
+          <button type="button" data-view="mapa" aria-pressed="false">Mapa</button>
+        </div>
+      </div>
+      <div id="mapa" class="map" hidden></div>
+      <p id="mapa-info" class="map-info" hidden></p>
       <ol id="lista" class="cards"></ol>
       <button id="wiecej" type="button" class="more" hidden>Pokaż więcej</button>
     </section>
@@ -84,6 +92,9 @@
       <p>
         Dane: Narodowy Fundusz Zdrowia, API
         <a href="https://apinfz.nfz.gov.pl/app-itl-api-pcus/">Terminy Leczenia</a>.
+        Położenie placówek: geokodowanie adresów w usłudze
+        <a href="https://services.gugik.gov.pl/uug/">GUGiK</a>, mapa ©
+        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
         <span id="aktualizacja"></span>
       </p>
       <p>

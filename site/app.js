@@ -3,6 +3,7 @@
 
 import {
   decodeRows,
+  inPoland,
   fold,
   mapHref,
   plural,
@@ -15,6 +16,19 @@ import {
 const DATA_DIR = "data";
 const PAGE_SIZE = 30;
 const STORAGE_KEY = "nfz-terminy:woj";
+const APPROX_LOCATION_BIT = 64; // położenie przybliżone (środek ulicy) - nfz_terminy/export.py
+
+// Leaflet ładowany dopiero przy pierwszym otwarciu mapy (wersje przypięte)
+const LEAFLET = {
+  css: [
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css",
+  ],
+  js: [
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js",
+  ],
+};
 
 // Bity pola "flags" (zgodne z nfz_terminy/export.py)
 const FILTERS = [
@@ -38,6 +52,9 @@ const ui = {
   list: $("lista"),
   more: $("wiecej"),
   updated: $("aktualizacja"),
+  map: $("mapa"),
+  mapInfo: $("mapa-info"),
+  viewButtons: document.querySelectorAll(".view-switch button"),
 };
 
 const state = {
@@ -47,6 +64,7 @@ const state = {
   city: "",
   filters: new Set(),
   shown: PAGE_SIZE,
+  view: "lista", // "lista" albo "mapa"
 };
 
 let manifest = null;
@@ -111,6 +129,7 @@ function readHash() {
     benefit: params.get("s") ?? "",
     city: params.get("m") ?? "",
     filters: new Set((params.get("f") ?? "").split(",").filter(Boolean)),
+    view: params.get("w") === "mapa" ? "mapa" : "lista",
   };
 }
 
@@ -121,6 +140,7 @@ function writeHash() {
   if (state.benefit) params.set("s", state.benefit);
   if (state.city) params.set("m", state.city);
   if (state.filters.size) params.set("f", [...state.filters].join(","));
+  if (state.view === "mapa") params.set("w", "mapa");
   const hash = params.toString();
   history.replaceState(null, "", hash ? `#${hash}` : location.pathname + location.search);
 }
@@ -224,6 +244,127 @@ function chooseBenefit(name) {
   render();
 }
 
+// --- mapa ---
+
+let leafletPromise = null;
+let map = null;
+let clusterLayer = null;
+
+function loadAsset(url, kind) {
+  return new Promise((resolve, reject) => {
+    const node =
+      kind === "css"
+        ? el("link", { rel: "stylesheet", href: url, crossorigin: "anonymous" })
+        : el("script", { src: url, crossorigin: "anonymous" });
+    node.addEventListener("load", resolve);
+    node.addEventListener("error", () => reject(new Error(`Nie wczytano ${url}`)));
+    document.head.append(node);
+  });
+}
+
+function loadLeaflet() {
+  if (!leafletPromise) {
+    leafletPromise = (async () => {
+      await Promise.all(LEAFLET.css.map((url) => loadAsset(url, "css")));
+      for (const url of LEAFLET.js) await loadAsset(url, "js"); // wtyczka wymaga Leafleta
+      return window.L;
+    })();
+    leafletPromise.catch(() => {
+      leafletPromise = null;
+    });
+  }
+  return leafletPromise;
+}
+
+function ensureMap(L) {
+  if (map) return;
+  map = L.map(ui.map, { scrollWheelZoom: true }).setView([52.1, 19.4], 6);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+  clusterLayer = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 50,
+    // klaster pokazuje najkrótszą prognozę wśród swoich placówek
+    iconCreateFunction(cluster) {
+      const markers = cluster.getAllChildMarkers();
+      const best = Math.min(...markers.map((m) => m.options.days ?? Infinity));
+      const known = Number.isFinite(best);
+      return L.divIcon({
+        // tylko liczby - żadnych danych z zewnątrz w HTML
+        html: `<span>${known ? `${best} d` : "?"}</span><small>${markers.length}</small>`,
+        className: `cluster ${waitClass(known ? best : null)}`,
+        iconSize: [46, 46],
+      });
+    },
+  });
+  map.addLayer(clusterLayer);
+}
+
+function renderPopup(row) {
+  const tel = row.phone ? telHref(row.phone) : null;
+  return el(
+    "div",
+    { class: "popup" },
+    el("p", { class: "pcus" }, row.pcus),
+    el("p", {}, el("strong", {}, row.provider ?? "Placówka")),
+    row.place && el("p", { class: "muted" }, row.place),
+    el("p", {}, [row.address, row.locality && titleCase(row.locality)].filter(Boolean).join(", ")),
+    tel && el("p", {}, el("a", { href: tel }, row.phone)),
+    (row.flags & APPROX_LOCATION_BIT) !== 0 &&
+      el("p", { class: "muted" }, "Położenie przybliżone (ulica, bez numeru budynku)."),
+    el("p", {}, el("a", { href: mapHref(row), target: "_blank", rel: "noopener" }, "Wyznacz trasę")),
+  );
+}
+
+async function renderMap(rows) {
+  let L;
+  try {
+    L = await loadLeaflet();
+  } catch (error) {
+    console.error(error);
+    ui.mapInfo.hidden = false;
+    ui.mapInfo.textContent = "Nie udało się wczytać mapy. Sprawdź połączenie lub skorzystaj z listy.";
+    return;
+  }
+  if (state.view !== "mapa") return; // użytkownik zdążył wrócić do listy
+  ensureMap(L);
+  map.invalidateSize();
+  clusterLayer.clearLayers();
+
+  const located = rows.filter((row) => inPoland(row.lat, row.lon));
+  const markers = located.map((row) => {
+    const approx = (row.flags & APPROX_LOCATION_BIT) !== 0 ? " approx" : "";
+    const marker = L.marker([row.lat, row.lon], {
+      days: row.days,
+      title: `${row.pcus} - ${row.provider ?? ""}`,
+      icon: L.divIcon({
+        html: `<span>${row.days != null ? Number(row.days) : "?"}</span>`,
+        className: `pin ${waitClass(row.days)}${approx}`,
+        iconSize: null,
+      }),
+    });
+    marker.bindPopup(() => renderPopup(row));
+    return marker;
+  });
+  clusterLayer.addLayers(markers);
+  if (markers.length) {
+    map.fitBounds(L.latLngBounds(located.map((row) => [row.lat, row.lon])), {
+      padding: [30, 30],
+      maxZoom: 15,
+    });
+  }
+
+  const missing = rows.length - located.length;
+  ui.mapInfo.hidden = false;
+  ui.mapInfo.textContent =
+    "Liczba na pinezce to prognoza w dniach, a na kółku - najkrótsza prognoza w okolicy." +
+    (missing > 0
+      ? ` ${missing} ${plural(missing, ["placówki", "placówek", "placówek"])} nie ma na mapie (nieznane położenie) - są na liście.`
+      : "");
+}
+
 // --- renderowanie ---
 
 function renderProvinces() {
@@ -316,9 +457,19 @@ function renderCard(row) {
   );
 }
 
+function setView(view) {
+  state.view = view;
+  ui.viewButtons.forEach((button) =>
+    button.setAttribute("aria-pressed", String(button.dataset.view === view)),
+  );
+}
+
 function render() {
   writeHash();
   ui.more.hidden = true;
+  ui.map.hidden = true;
+  ui.mapInfo.hidden = true;
+  ui.list.hidden = false;
 
   if (!state.province) {
     ui.list.replaceChildren();
@@ -338,9 +489,16 @@ function render() {
   }
 
   const rows = matchingRows();
-  const shown = rows.slice(0, state.shown);
-  ui.list.replaceChildren(...shown.map(renderCard));
-  ui.more.hidden = rows.length <= shown.length;
+  if (state.view === "mapa" && rows.length) {
+    ui.list.hidden = true;
+    ui.list.replaceChildren();
+    ui.map.hidden = false;
+    renderMap(rows);
+  } else {
+    const shown = rows.slice(0, state.shown);
+    ui.list.replaceChildren(...shown.map(renderCard));
+    ui.more.hidden = rows.length <= shown.length;
+  }
 
   if (!rows.length) {
     setStatus("Brak placówek spełniających wybrane warunki. Spróbuj usunąć część filtrów lub wybrać całe województwo.");
@@ -450,6 +608,13 @@ function bindEvents() {
     chooseBenefit(suggestions[Number(item.dataset.index)].name);
   });
 
+  ui.viewButtons.forEach((button) =>
+    button.addEventListener("click", () => {
+      setView(button.dataset.view);
+      render();
+    }),
+  );
+
   ui.more.addEventListener("click", () => {
     state.shown += PAGE_SIZE;
     render();
@@ -476,6 +641,7 @@ async function init() {
   state.benefit = fromHash.benefit;
   state.city = fromHash.city;
   state.filters = new Set([...fromHash.filters].filter((key) => FILTERS.some((f) => f.key === key)));
+  setView(fromHash.view);
 
   ui.province.value = state.province;
   document.getElementById(state.urgent ? "przypadek-2" : "przypadek-1").checked = true;

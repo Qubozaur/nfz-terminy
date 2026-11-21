@@ -28,8 +28,9 @@ w tym rodzicom czy dziadkom.
 
 Wybierz województwo, wpisz specjalistę (np. „ortopeda”, polskie znaki można pominąć),
 opcjonalnie miejscowość i udogodnienia: podjazd, winda, łazienka dla niepełnosprawnych,
-parking, przyjmowanie dzieci. Wyniki można wysłać komuś linkiem, bo filtry są zapisane
-w adresie strony. Strona działa też na telefonie.
+parking, przyjmowanie dzieci. Wyniki można obejrzeć jako listę albo na **mapie**: pinezka
+pokazuje prognozę w dniach, a kolor od razu mówi, gdzie czeka się krótko. Wyniki można
+wysłać komuś linkiem, bo filtry są zapisane w adresie strony. Strona działa też na telefonie.
 
 API NFZ nie pozwala odpytywać się bezpośrednio z przeglądarki, więc dane są pobierane raz
 na dobę przez GitHub Actions (`python -m nfz_terminy.export`) i publikowane jako pliki JSON
@@ -140,6 +141,12 @@ w wersji 1.4. Kilka rzeczy, które warto wiedzieć, jeśli chcesz z niego korzys
   „PORADNIA X DLA DZIECI”; narzędzie odfiltrowuje to, czego nie wybrano.
 - API ogranicza liczbę zapytań (HTTP 429). Klient robi przerwy między zapytaniami
   i ponawia próby z rosnącym odstępem.
+- Współrzędne placówek NFZ podaje tylko dla części z nich, a część jest błędna
+  (zamieniona szerokość z długością, punkt zastępczy w polu, sąsiedni budynek). Dlatego
+  do mapy adresy są geokodowane w [Uniwersalnej Usłudze Geokodowania GUGiK](https://services.gugik.gov.pl/uug/)
+  (państwowy rejestr punktów adresowych), z kodem gminy TERYT z danych NFZ, żeby nie pomylić
+  miejscowości o tej samej nazwie. Gdy brak numeru budynku w rejestrze, pinezka stoi
+  na środku ulicy i jest oznaczona jako przybliżona.
 
 ## Użycie jako biblioteki
 
@@ -176,7 +183,8 @@ Zrzut ekranu w README odświeża `python scripts/zrzut_ekranu.py`.
 ### Strona lokalnie
 
 ```bash
-python -m nfz_terminy.export --out site/data --woj opolskie   # dane jednego województwa, ok. 2 min
+python -m nfz_terminy.export --out site/data --woj opolskie \
+    --geokoduj --geokod-cache geokodowanie.json               # jedno województwo, ok. 5 min
 python -m http.server -d site 8000                            # http://localhost:8000
 node --test site/tests/logic.test.mjs                         # testy logiki strony
 ```
@@ -192,7 +200,7 @@ potem Actions → *Strona WWW* → *Run workflow* z zaznaczonym „Pobierz świe
 
 - [x] Wyszukiwarka w terminalu
 - [x] Strona WWW z filtrami dostępności
-- [ ] Mapa placówek
+- [x] Mapa placówek
 - [ ] `nfz obserwuj`: powiadomienie na Telegramie, gdy pojawi się krótsza kolejka
 
 Zgłoszenia błędów i pomysły mile widziane w [Issues](https://github.com/Qubozaur/nfz-terminy/issues).

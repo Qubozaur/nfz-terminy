@@ -154,3 +154,8 @@ export function mapHref(row) {
       : [row.address, row.locality].filter(Boolean).join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
+
+/** Czy punkt leży w Polsce (prostokąt z zapasem, jak POLAND_LAT/LON w export.py). */
+export function inPoland(lat, lon) {
+  return lat != null && lon != null && lat >= 48.9 && lat <= 55.0 && lon >= 14.0 && lon <= 24.3;
+}
