@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "generated": "2026-11-28T08:53:40+00:00",
+  "source": "https://apinfz.nfz.gov.pl/app-itl-api-pcus",
+  "generator": "nfz-terminy 0.1.0",
+  "provinces": {
+    "01": "dolnośląskie",
+    "02": "kujawsko-pomorskie",
+    "03": "lubelskie",
+    "04": "lubuskie",
+    "05": "łódzkie",
+    "06": "małopolskie",
+    "07": "mazowieckie",
+    "08": "opolskie",
+    "09": "podkarpackie",
+    "10": "podlaskie",
+    "11": "pomorskie",
+    "12": "śląskie",
+    "13": "świętokrzyskie",
+    "14": "warmińsko-mazurskie",
+    "15": "wielkopolskie",
+    "16": "zachodniopomorskie"
+  },
+  "files": {
+    "01-1": {
+      "rows": 5278,
+      "benefits": 372,
+      "located": 5186
+    },
+    "01-2": {
+      "rows": 5278,
+      "benefits": 372,
+      "located": 5186
+    },
+    "02-1": {
+      "rows": 3828,
+      "benefits": 349,
+      "located": 3626
+    },
+    "02-2": {
+      "rows": 3828,
+      "benefits": 349,
+      "located": 3626
+    },
+    "03-1": {
+      "rows": 4692,
+      "benefits": 359,
+      "located": 4568
+    },
+    "03-2": {
+      "rows": 4692,
+      "benefits": 359,
+      "located": 4568
+    },
+    "04-1": {
+      "rows": 1707,
+      "benefits": 279,
+      "located": 1668
+    },
+    "04-2": {
+      "rows": 1707,
+      "benefits": 279,
+      "located": 1668
+    },
+    "05-1": {
+      "rows": 5156,
+      "benefits": 377,
+      "located": 5156
+    },
+    "05-2": {
+      "rows": 5156,
+      "benefits": 377,
+      "located": 5156
+    },
+    "06-1": {
+      "rows": 5682,
+      "benefits": 382,
+      "located": 5542
+    },
+    "06-2": {
+      "rows": 5682,
+      "benefits": 382,
+      "located": 5542
+    },
+    "07-1": {
+      "rows": 9742,
+      "benefits": 414,
+      "located": 9435
+    },
+    "07-2": {
+      "rows": 9742,
+      "benefits": 414,
+      "located": 9435
+    },
+    "08-1": {
+      "rows": 1707,
+      "benefits": 270,
+      "located": 1678
+    },
+    "08-2": {
+      "rows": 1707,
+      "benefits": 270,
+      "located": 1678
+    },
+    "09-1": {
+      "rows": 4766,
+      "benefits": 321,
+      "located": 4458
+    },
+    "09-2": {
+      "rows": 4766,
+      "benefits": 321,
+      "located": 4458
+    },
+    "10-1": {
+      "rows": 2407,
+      "benefits": 338,
+      "located": 2325
+    },
+    "10-2": {
+      "rows": 2407,
+      "benefits": 338,
+      "located": 2325
+    },
+    "11-1": {
+      "rows": 3517,
+      "benefits": 362,
+      "located": 3469
+    },
+    "11-2": {
+      "rows": 3517,
+      "benefits": 362,
+      "located": 3469
+    },
+    "12-1": {
+      "rows": 8103,
+      "benefits": 394,
+      "located": 7966
+    },
+    "12-2": {
+      "rows": 8103,
+      "benefits": 394,
+      "located": 7966
+    },
+    "13-1": {
+      "rows": 2506,
+      "benefits": 292,
+      "located": 2399
+    },
+    "13-2": {
+      "rows": 2506,
+      "benefits": 292,
+      "located": 2399
+    },
+    "14-1": {
+      "rows": 2550,
+      "benefits": 295,
+      "located": 2481
+    },
+    "14-2": {
+      "rows": 2550,
+      "benefits": 295,
+      "located": 2481
+    },
+    "15-1": {
+      "rows": 5958,
+      "benefits": 381,
+      "located": 5699
+    },
+    "15-2": {
+      "rows": 5958,
+      "benefits": 381,
+      "located": 5699
+    },
+    "16-1": {
+      "rows": 2775,
+      "benefits": 293,
+      "located": 2708
+    },
+    "16-2": {
+      "rows": 2775,
+      "benefits": 293,
+      "located": 2708
+    }
+  }
+}
